@@ -76,6 +76,8 @@ const App = () => {
       setInputValue(transcript);
       console.log('Text from voice:', transcript);
       setModalOpen(false);
+      handleButtonClick(transcript);
+
     };
 
     recognition.onerror = (event) => {
@@ -94,7 +96,7 @@ const App = () => {
     setModalOpen(false);
   };
 
-  const handleButtonClick = async () => {
+  const handleButtonClick = async (inputValue) => {
     try {
       console.log(`API_KEY: ${API_KEY}`);
       setLoading(true);
