@@ -3,11 +3,12 @@ import TextEntry from './components/TextEntry/TextEntry';
 import ResponseDisplay from './components/ResponseDisplay/ResponseDisplay';
 import MicModal from './components/MicModal/MicModal';
 import Loader from './components/Loader/Loader';
-import './App.css';
-import { useLocalStorage } from './hooks/useHistory';
+import History from './components/History/History'; // Importing History component
+import { useLocalStorage } from './hooks/useHistory'; // Importing useLocalStorage hook
 import { useSpeechRecognitionWithMicModal } from './hooks/SpeechRecognition';
 import usePredictionHandler from './hooks/Handlesubmit';
 import Button from './components/ButtonModal/ButtonModal';
+import './App.css';
 
 const API_KEY = "zI6TjysqiHhgI13l2l1j2OWMRFPk9fsVo031alKC"
 
@@ -16,20 +17,12 @@ const App = () => {
   const [response, setResponse] = useState('');
   const [showHistory, setShowHistory] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [searchHistory, setSearchHistory] = useLocalStorage('searchHistory', []);
+  const [searchHistory, setSearchHistory] = useLocalStorage('searchHistory', []); 
 
   const handleresponse = (text) => {
     setResponse(text);
   };
-
-  const {loading, handleSubmit} = usePredictionHandler(API_KEY, handleresponse);
-
-  useEffect(() => {
-    const storedHistory = localStorage.getItem('searchHistory');
-    if (storedHistory) {
-      setSearchHistory(JSON.parse(storedHistory));
-    }
-  }, [setSearchHistory]); 
+  const {loading, handleSubmit} = usePredictionHandler(API_KEY, handleresponse); 
 
   const handleChange = (event) => {
     setInputValue(event.target.value);
@@ -49,14 +42,7 @@ const App = () => {
     <div className="app-container">
       <div className="main-container">
         {window.innerWidth > 700 && (
-          <div className="history-container">
-            <>
-              <h2>Search History:</h2>
-              {showHistory && searchHistory.map((item, index) => (
-                <div key={index} className="history-item">{item}</div>
-              ))}
-            </>
-          </div>
+          <History showHistory={showHistory} searchHistory={searchHistory} />
         )}
         <div className="content-container">
           <h1>Welcome to NEWCHAT</h1>
