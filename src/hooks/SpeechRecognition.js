@@ -1,48 +1,47 @@
 import { useState } from 'react';
-import { useSpeechRecognition } from 'react-speech-recognition';
-export const useSpeechToText = () => {
-    const { transcript, resetTranscript } = useSpeechRecognition();
-  
-    return { transcript, resetTranscript };
-  };
-export const useSpeechRecognitionWithMicModal = (handleSubmit) => {
-    const [listening, setListening] = useState(false);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [error, setError] = useState('');
-    const [transcript, setTranscript] = useState('');
-  
-    const startRecognition = () => {
-      setListening(true);
-      setError('');
-      setModalOpen(true);
-  
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'en-US';
-      recognition.start();
-  
-      recognition.onresult = (event) => {
+import usePredictionHandler from './Handlesubmit';
+
+export const useSpeechRecognitionWithMicModal = ({ handleModalClose ,handleresponse}) => {
+  const API_KEY = "zI6TjysqiHhgI13l2l1j2OWMRFPk9fsVo031alKC";
+  const { handleSubmit, saveToSearchHistory } = usePredictionHandler(API_KEY, handleresponse);
+  const [listening, setListening] = useState(false);
+  const [error, setError] = useState('');
+
+  const startRecognition = () => {
+    setListening(true);
+    setError('');
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'en-US';
+    recognition.start();
+
+    recognition.onresult = async (event) => {
+      try {
         const transcript = event.results[0][0].transcript;
-        setTranscript(transcript);
-        setModalOpen(false);
-        handleSubmit(transcript);
-      };
-  
-      recognition.onerror = (event) => {
+        handleSubmit(transcript, handleresponse)
+        .then(result => {
+          console.log(result, "handleSubmit");
+        })
+        .catch(error => {
+          console.error('Error occurred:', error);
+        });
+      
+        saveToSearchHistory(transcript);
+      } catch (error) {
         setError('Error occurred during recognition. Please try again.');
-        console.error('Error occurred during recognition:', event.error);
-        setModalOpen(false);
-      };
-  
-      recognition.onend = () => {
-        setListening(false);
-        setModalOpen(false);
-      };
+        console.error('Error occurred during recognition:', error);
+      }
     };
-  
-    const handleModalClose = () => {
-      setModalOpen(false);
+
+    recognition.onerror = (event) => {
+      setError('Error occurred during recognition. Please try again.');
+      console.error('Error occurred during recognition:', event.error);
     };
-  
-    return { listening, modalOpen, error, transcript, startRecognition, handleModalClose };
+
+    recognition.onend = () => {
+      setListening(false);
+      handleModalClose();
+    };
   };
-  
+
+  return { listening, error,startRecognition};
+};

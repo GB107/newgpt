@@ -5,67 +5,45 @@ import MicModal from './components/MicModal/MicModal';
 import Loader from './components/Loader/Loader';
 import './App.css';
 import { useLocalStorage } from './hooks/useHistory';
-import { useCohereClient } from './hooks/Cohere';
 import { useSpeechRecognitionWithMicModal } from './hooks/SpeechRecognition';
+import usePredictionHandler from './hooks/Handlesubmit';
+import Button from './components/ButtonModal/ButtonModal';
 
-const API_KEY = process.env.REACT_APP_API_KEY;
+const API_KEY = "zI6TjysqiHhgI13l2l1j2OWMRFPk9fsVo031alKC"
 
 const App = () => {
   const [inputValue, setInputValue] = useState('');
   const [response, setResponse] = useState('');
-  const [loading, setLoading] = useState(false);
   const [showHistory, setShowHistory] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
   const [searchHistory, setSearchHistory] = useLocalStorage('searchHistory', []);
-  const cohereClient = useCohereClient(API_KEY);
-  
-  const handleSubmit = async (transcript) => {
-    try {
-      setLoading(true);
-      const prediction = await cohereClient.generate({
-        prompt: transcript,
-        maxTokens: 550,
-      });
 
-      const generatedText = prediction.generations[0].text;
-      setResponse(generatedText);
-      speakText(generatedText);
-      saveToSearchHistory(transcript);
-    } catch (error) {
-      console.error('Error occurred:', error);
-    } finally {
-      setLoading(false);
-    }
+  const handleresponse = (text) => {
+    setResponse(text);
   };
 
-  const { listening, modalOpen, error, transcript, startRecognition, handleModalClose } = useSpeechRecognitionWithMicModal(handleSubmit);
+  const {loading, handleSubmit} = usePredictionHandler(API_KEY, handleresponse);
 
   useEffect(() => {
     const storedHistory = localStorage.getItem('searchHistory');
     if (storedHistory) {
       setSearchHistory(JSON.parse(storedHistory));
     }
-  }, []);
-
-  const saveToSearchHistory = (query) => {
-    const updatedHistory = [query, ...searchHistory];
-    setSearchHistory(updatedHistory);
-    localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
-  };
+  }, [setSearchHistory]); 
 
   const handleChange = (event) => {
     setInputValue(event.target.value);
   };
 
-  const speakText = (text) => {
-    const speechSynthesis = window.speechSynthesis;
-    const utterance = new SpeechSynthesisUtterance(text);
-    speechSynthesis.speak(utterance);
+  const handleMicClick = () => {
+    setModalOpen(true);
   };
-  const stopSpeaking = () => {
-    const speechSynthesis = window.speechSynthesis;
-    speechSynthesis.cancel();
-    // setIsSpeaking(false);
+
+  const handleModalClose = () => {
+    setModalOpen(false);
   };
+
+  const { listening} = useSpeechRecognitionWithMicModal(handleModalClose,handleresponse);
 
   return (
     <div className="app-container">
@@ -84,32 +62,29 @@ const App = () => {
           <h1>Welcome to NEWCHAT</h1>
           <p>Search manually or use the microphone:</p>
           <TextEntry
+            handleMicClick={handleMicClick}
+            listening={listening}
             inputValue={inputValue}
             handleChange={handleChange}
-            handleMicClick={startRecognition}
-            listening={listening}
           />
-          <button
+          <Button
+            children={"submit"}
             className="submit-button"
-            onClick={() => handleSubmit(inputValue)}
-            disabled={listening} 
-          >
-            Submit
-          </button>
+            onClick={() => handleSubmit(inputValue, handleresponse)}
+            disabled={listening || loading}
+          />
+          {loading && <Loader />}
           {response && !loading && (
             <ResponseDisplay
               response={response}
-              loading={loading}
-              stopSpeaking={stopSpeaking}
             />
           )}
           {modalOpen && (
             <MicModal
-              error={error}
               handleModalClose={handleModalClose}
+              handleresponse={handleresponse}
             />
           )}
-          {loading && <Loader />}
         </div>
       </div>
     </div>

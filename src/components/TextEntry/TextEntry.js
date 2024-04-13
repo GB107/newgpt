@@ -1,8 +1,9 @@
 import React from 'react';
 import Textarea from '@mui/joy/Textarea';
 import MicIcon from '@mui/icons-material/Mic';
+import Loader from '../Loader/Loader'; 
 
-const TextEntry = ({ darkMode, inputValue, handleChange, handleMicClick, listening }) => {
+const TextEntry = ({ handleMicClick, listening, darkMode, inputValue, handleChange, loadingResponse }) => {
   return (
     <div style={{ position: 'relative' }}>
       <Textarea
@@ -21,7 +22,7 @@ const TextEntry = ({ darkMode, inputValue, handleChange, handleMicClick, listeni
         }}
       />
       <button
-        role="button" // Add role attribute
+        role="button"
         style={{ position: 'absolute', top: '50%', right: '10px', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer' }}
         onClick={handleMicClick}
         disabled={listening}
@@ -29,6 +30,7 @@ const TextEntry = ({ darkMode, inputValue, handleChange, handleMicClick, listeni
       >
         {listening ? 'Listening...' : <MicIcon />}
       </button>
+      {loadingResponse && <Loader />}
     </div>
   );
 };
