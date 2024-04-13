@@ -1,6 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-const History = ({ showHistory, searchHistory }) => {
+const History = ({ showHistory }) => {
+  const [searchHistory, setSearchHistory] = useState([]);
+
+  useEffect(() => {
+    const storedHistory = localStorage.getItem('searchHistory');
+    if (storedHistory) {
+      setSearchHistory(JSON.parse(storedHistory));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+  }, [searchHistory]);
+
   return (
     <div className="history-container">
       {showHistory && (
