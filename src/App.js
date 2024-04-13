@@ -8,7 +8,6 @@ import History from './components/History/History';
 =======
 import History from './components/History/History'; 
 import { useLocalStorage } from './hooks/useHistory'; 
->>>>>>> 20db445a5564985a6ef84eba0de2b15ed3413f1c
 import { useSpeechRecognitionWithMicModal } from './hooks/SpeechRecognition';
 import usePredictionHandler from './hooks/Handlesubmit';
 import Button from './components/ButtonModal/ButtonModal';
