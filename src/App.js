@@ -3,8 +3,8 @@ import TextEntry from './components/TextEntry/TextEntry';
 import ResponseDisplay from './components/ResponseDisplay/ResponseDisplay';
 import MicModal from './components/MicModal/MicModal';
 import Loader from './components/Loader/Loader';
-import History from './components/History/History'; // Importing History component
-import { useLocalStorage } from './hooks/useHistory'; // Importing useLocalStorage hook
+import History from './components/History/History'; 
+import { useLocalStorage } from './hooks/useHistory'; 
 import { useSpeechRecognitionWithMicModal } from './hooks/SpeechRecognition';
 import usePredictionHandler from './hooks/Handlesubmit';
 import Button from './components/ButtonModal/ButtonModal';
